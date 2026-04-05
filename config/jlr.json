@@ -1,0 +1,62 @@
+{
+  "client": "JLR",
+  "brand": "Jaguar",
+  "input_files": {
+    "data": ["Input_Data_1.xlsx", "Input_Data_2.xlsx"],
+    "bigram_taxonomy": "Bigram tagging_taxonomy.xlsx",
+    "monogram_taxonomy": "monogram tagging_taxonomy.xlsx"
+  },
+  "message_filters": [
+    ".*west bank.*", ".*follow autoeuroland.*", ".*kfc / reliance digital.*",
+    ".*harga paket khusus kredit.*", ".*credit broker.*", ".*otr kredit.*",
+    ".*menlo park.*", ".*tag friend.*", ".*dar es salaam.*", ".*senate inquiry.*",
+    ".*email address.*", ".*view attachment.*", ".*meet goals.*",
+    ".*call.*", ".*email.*", ".*wechat.*", ".*whatsapp.*", ".*we chat.*"
+  ],
+  "bigram_filters": [
+    ".*landrover.*", ".*insta.*", ".*thank.*", ".*car.*", ".*vehicle.*",
+    ".*life.*", ".*photo.*", ".*youtube.*", ".*hyundai.*", ".*defender.*",
+    ".*xx.*", ".*rover.*", ".*reel.*", ".*twitter.*", ".*pic.*",
+    ".*mahindra.*", ".*tarmac.*", ".*america.*", ".*microsoft.*",
+    ".*lego.*", ".*image.*", ".*quote.*", ".*biggboss.*", ".*ever.*",
+    ".*put.*", ".*click.*", ".*seem.*", ".*comment.*", ".*thing.*",
+    ".*scale.*", ".*craw.*", ".*rolls.*", ".*gts.*", ".*viper.*", ".*gclass.*"
+  ],
+  "custom_stopwords": [
+    "http", "https", "www", "com", "org", "still", "version", "statement",
+    "sale", "start", "come", "thanks", "auto", "near", "land", "rover",
+    "new", "will", "range", "one", "like", "can", "many", "lti", "suv",
+    "good", "just", "series", "now", "road", "day", "tdi", "also", "time",
+    "get", "option", "rear", "work", "nan", "use", "take", "great", "video",
+    "beautiful", "color", "way", "add", "love", "photos", "game", "see",
+    "buy", "first", "reel", "have", "make", "year", "know", "thing", "think",
+    "only", "without", "inch", "need", "let", "project", "always", "shop",
+    "thar", "area", "include", "pack", "say", "follow", "today", "super",
+    "brand", "little", "don", "show", "big", "find", "part", "may", "much",
+    "even", "two", "available", "long", "back", "every", "around", "currently",
+    "small", "keep", "light", "owner", "another", "bite", "post", "really",
+    "old", "want", "last", "full", "landy", "next", "ready", "sell", "edition",
+    "end", "mile", "offer", "please", "fit", "week", "body", "lot", "scale",
+    "front", "customer", "feel", "give", "happy", "diecast", "mean", "test",
+    "list", "viral", "lift", "high", "top", "review", "change", "people",
+    "trend", "cool", "runner", "standard", "far", "since", "doesn", "yes",
+    "though", "free", "svr", "didn", "actually", "name", "etc", "hello",
+    "originally", "ago", "guy", "maybe", "probably"
+  ],
+  "bigram_normalizations": {
+    ".*offroad.*": "offroad",
+    ".*overland.*": "overland",
+    ".*camp.*": "camp",
+    ".*travel.*": "travel",
+    ".*adventur.*": "adventure",
+    ".*love.*": "love",
+    ".*roadtrip.*": "roadtrip",
+    ".*seat.*": "seat",
+    ".*electric.*": "electric",
+    ".*classic.*": "classic",
+    ".*noisey.*": "noise",
+    ".*explor.*": "explore"
+  },
+  "car_brands_to_remove": [],
+  "min_word_length": 3
+}

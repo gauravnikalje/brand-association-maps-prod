@@ -1,0 +1,141 @@
+AntiGravity
+Brand Association Mapping (BAM) — AI Pipeline
+Product Requirements Document  |  MVP 1
+Version 1.0  |  March 2026
+Confidential — Internal Use Only
+Document Information
+Executive Summary
+This document defines the requirements, scope, and delivery plan for MVP 1 of the AntiGravity Brand Association Mapping (BAM) AI pipeline. The goal of MVP 1 is to re-implement the existing R-based BAM workflow in Python, enriched with AI-assisted components, so that the process is faster, more scalable, and deployable across new Accenture client engagements with minimal manual effort.
+The current JLR/Range Rover implementation takes approximately 3 weeks end-to-end. MVP 1 aims to reduce this to under 1 week for repeat clients and under 2 weeks for new clients, while improving output quality through AI-assisted taxonomy suggestions and smarter text normalisation.
+Background & Problem Statement
+What is BAM?
+Brand Association Mapping (BAM) is a structured NLP methodology that analyses social media and earned media mentions to identify which brand attributes (Design, Performance, Heritage, etc.) consumers most associate with a brand, and whether those associations are positive or negative.
+The current workflow consists of:
+Exporting mentions from Sprinklr (owned + earned, excluding neutral)
+Cleaning and lemmatising message text
+Generating sorted bigrams and mapping them to a pre-built taxonomy (T1 → T4)
+Performing sentiment mapping at the mention level
+Computing association strength (Strong / Moderate / Weak / Negligible) at word, T2, T3, and T4 levels
+Current Pain Points
+Manual, fragile R code — hundreds of hardcoded regex rules per client
+No reusability across clients — every new brand requires weeks of taxonomy building
+3-week turnaround for JLR; estimated 2+ months for a brand-new client
+No AI assistance in taxonomy generation — analysts build everything from scratch
+Single-developer dependency — process is not documented enough for handoff
+Opportunity
+By migrating to Python with AI-assisted components, AntiGravity can:
+Cut execution time by 60–70% for existing clients
+Reduce new-client onboarding from 2 months to 2–3 weeks
+Expose BAM as a scalable SaaS or managed-insights service to Accenture client teams
+Build a proprietary AI taxonomy engine as a competitive differentiator
+Goals & Non-Goals
+MVP 1 Goals
+Re-implement the full BAM pipeline in Python (pandas, spaCy / lookup-based lemmatiser, openpyxl)
+Replace all hardcoded R regex with a configurable, client-agnostic JSON config file
+Achieve parity with R output: ≥95% taxonomy recall, ±5% bigram count delta
+Produce a validated multi-sheet Excel output at word, T2, T3, and T4 levels
+Document the pipeline as a runbook so any analyst can execute it with a single CLI command
+Test on both available datasets: Input_Data_1 (10,000 messages) and Input_Data_2 (146 messages)
+Out of Scope for MVP 1
+UI / web front-end (planned for MVP 2 / SaaS phase)
+AI-generated taxonomy suggestions (planned for MVP 2)
+Automated sentiment re-classification using LLMs (Sprinklr sentiment used as-is)
+Real-time / streaming pipeline (batch only in MVP 1)
+Multi-language support beyond English
+Technical Architecture
+Pipeline Stages
+The Python pipeline mirrors the R workflow in 5 sequential stages:
+Data Ingestion & Validation
+Read Input_Data_*.xlsx (SocialNetwork, Message, Sentiment columns)
+Schema validation — raise clear errors on missing columns or empty datasets
+Drop NaN messages; normalise Sentiment to uppercase
+Text Cleaning & Lemmatisation
+Lowercase, strip punctuation, collapse repeated characters
+Apply configurable message-level regex filters (from client JSON config)
+Lemmatise using spaCy (en_core_web_sm) or fallback lookup table if spaCy unavailable
+Bigram Generation & Filtering
+Sliding-window bigram tokeniser over cleaned messages
+Filter stopwords (built-in NLTK list + client-specific stopwords from JSON config)
+Remove country/city names, numeric tokens, single/double-character tokens
+Sort each bigram pair alphabetically (word1 < word2) for deduplication
+Apply bigram-level regex replacements (offroad, adventure, electric, etc.)
+Count and sort final bigrams
+Taxonomy Mapping (Bigram → Monogram fallback)
+Pass 1 — join bigrams to Bigram_tagging_taxonomy.xlsx on sorted (word1_word2) key
+Pass 2 — unmatched bigrams: join on word1 to monogram_tagging_taxonomy.xlsx
+Pass 3 — still-unmatched: join on word2 to monogram taxonomy
+Produce untagged bigrams file for analyst review
+Sentiment Mapping & Statistical Output
+Match bigrams back to source messages (both word orders) to capture sentiment
+Pivot to get Positive / Negative counts and percentages per bigram
+Compute quartile-based Mention Association (Strong/Moderate/Weak/Negligible)
+Compute Sentiment Association from Positive_perc thresholds (80/50/20)
+Derive Overall Association from combination matrix
+Aggregate to T2, T3, T4 levels and repeat association logic
+Component Mapping: R → Python
+Configuration File Design
+All client-specific parameters will live in a single config/<client_name>.json file:
+{ "client": "JLR", "message_filters": [".*call.*", ".*email.*"], "bigram_filters": [".*rover.*", ".*defender.*"], "custom_stopwords": ["nan", "suv", "good"], "bigram_replacements": { ".*offroad.*": "offroad", ".*adventur.*": "adventure" }, "taxonomy": { "bigram": "Bigram_tagging_taxonomy.xlsx", "monogram": "monogram_tagging_taxonomy.xlsx" } }
+Phased Execution Plan
+Phase 0 — Discovery & Setup  (Week 1)
+Set up Python environment (requirements.txt with pandas, openpyxl, spaCy)
+Run existing R code on Input_Data_1 and save all intermediate outputs as golden references
+Audit column schemas across both input files and both taxonomy files
+Create project folder structure: src/, config/, tests/, output/, notebooks/
+Define client JSON config for JLR as first reference config
+Phase 1 — Bigram Engine  (Weeks 1–2)
+Implement text cleaner module (src/cleaner.py) with config-driven filters
+Implement lemmatiser with spaCy primary and lookup-table fallback (src/lemmatiser.py)
+Implement bigram generator with stopword filtering and alphabetical sorting (src/bigrams.py)
+Unit test each function against R golden output — target ±5% bigram count delta
+Deliverable: bigram_counts.xlsx matching R output
+Phase 2 — Taxonomy Mapping  (Weeks 2–3)
+Implement 3-pass taxonomy mapper (src/taxonomy.py)
+Handle edge cases: duplicate bigrams, partial key matches, NA propagation
+Generate untagged_bigrams.xlsx for analyst review — format identical to current R output
+QA pass: compare tagged row count and T1 distribution to R baseline
+Deliverable: tagged_bigrams.xlsx with Attribute T1–T4 columns
+Phase 3 — Sentiment Mapping & Stats  (Weeks 3–4)
+Implement sentiment mapper: scan source messages for bigram matches in both orders
+Build pivot table (Positive/Negative counts and percentages)
+Implement quartile-based Mention Association using numpy.percentile
+Implement Sentiment Association thresholds and Overall Association matrix
+Aggregate to T2, T3, T4 levels with repeated association logic
+Deliverable: all 4 association outputs matching R association labels
+Phase 4 — Output, QA & Handoff  (Weeks 5–6)
+Build openpyxl writer: multi-sheet Excel with word-level, T2, T3, T4 sheets
+Apply professional formatting: header rows, column widths, freeze panes
+End-to-end test on Input_Data_2 (new brand data — tests config portability)
+Write analyst runbook: step-by-step guide + CLI usage
+Demo to pilot Accenture client team
+Deliverable: Final Excel output + runbook PDF
+Acceptance Criteria
+Milestones & Timeline
+Risks & Mitigations
+Future MVPs (Post MVP 1 Roadmap)
+MVP 2 — AI Taxonomy Engine  (Months 2–3)
+LLM-assisted taxonomy suggestion: given an untagged bigram, suggest T1–T4 classification
+Analyst review-and-approve UI (simple Streamlit or Gradio app)
+Automated taxonomy expansion as new client data comes in
+MVP 3 — Self-Serve Insights Platform  (Months 4–6)
+Web-based dashboard: upload data, configure client, view BAM outputs
+Multi-client management: separate config and taxonomy per brand
+Export to PowerPoint and PDF in addition to Excel
+Role-based access for Accenture client teams
+MVP 4 — SaaS Productisation  (Months 6–12)
+API-first architecture: REST endpoints for data ingestion and output retrieval
+Billing / usage metering per client or per 1,000 mentions processed
+Automated Sprinklr integration (direct pull, no manual export)
+Multi-language support (French, Spanish, German)
+Appendix: Data Inventory
+Input Files
+Input_Data_1.xlsx — 10,000 social mentions (SocialNetwork, Message, Sentiment)
+Input_Data_2.xlsx — 146 social mentions, second brand dataset
+Rawdata_ref.xlsx — Full Sprinklr export with 272 metadata columns (reference only)
+Taxonomy Files
+Bigram_tagging_taxonomy.xlsx — 2,268 tagged bigram pairs with T1–T4 classification
+monogram_tagging_taxonomy.xlsx — 506 single-word entries with T1–T4 classification
+Reference Code
+R_Code_Block_(for_reference).R — Full JLR R implementation used as baseline
+BAM_Execution_Process_Steps.docx — Analyst process documentation
+AntiGravity  |  BAM AI Pipeline PRD  |  MVP 1  |  Confidential

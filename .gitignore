@@ -1,0 +1,34 @@
+# Environments
+.env
+
+# Output files
+output/
+
+# Raw Data (Don't commit heavy datasets)
+Brand Association Maps/
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+env/
+.venv/
+
+# Next.js / Node
+node_modules/
+.next/
+out/
+build/
+.babelrc
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
