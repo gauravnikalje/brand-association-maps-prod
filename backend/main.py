@@ -18,10 +18,16 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTa
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+import logging
 
-load_dotenv()
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+
+from dotenv import load_dotenv
 
 # ── Path bootstrap so src.* modules are importable ──────────────────────────
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
