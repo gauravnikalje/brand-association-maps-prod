@@ -5,7 +5,8 @@
 output/
 
 # Raw Data (Don't commit heavy datasets)
-Brand Association Maps/
+Brand Association Maps/*
+!Brand Association Maps/*taxonomy.xlsx
 *.zip
 
 # Python
