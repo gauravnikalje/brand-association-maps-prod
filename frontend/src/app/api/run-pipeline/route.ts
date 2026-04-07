@@ -11,13 +11,18 @@ import { NextRequest, NextResponse } from "next/server";
  *   API_URL = https://your-railway-app.up.railway.app
  */
 export async function POST(req: NextRequest) {
-  const backendUrl = process.env.API_URL;
+  let backendUrl = process.env.API_URL;
 
   if (!backendUrl) {
     return NextResponse.json(
       { error: "Backend API URL is not configured. Set the API_URL environment variable." },
       { status: 503 }
     );
+  }
+
+  // Ensure the URL has a protocol, otherwise fetch() will fail to parse it
+  if (!backendUrl.startsWith("http://") && !backendUrl.startsWith("https://")) {
+    backendUrl = `https://${backendUrl}`;
   }
 
   try {

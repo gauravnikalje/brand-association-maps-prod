@@ -11,13 +11,17 @@ export async function GET(
   { params }: { params: Promise<{ run_id: string }> }
 ) {
   const { run_id } = await params;
-  const backendUrl = process.env.API_URL;
+  let backendUrl = process.env.API_URL;
 
   if (!backendUrl) {
     return NextResponse.json(
       { error: "Backend API URL is not configured." },
       { status: 503 }
     );
+  }
+
+  if (!backendUrl.startsWith("http://") && !backendUrl.startsWith("https://")) {
+    backendUrl = `https://${backendUrl}`;
   }
 
   try {
