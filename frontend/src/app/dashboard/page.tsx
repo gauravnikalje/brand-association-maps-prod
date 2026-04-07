@@ -30,11 +30,9 @@ export default function DashboardPage() {
     formData.append("file", file);
 
     try {
-      // NOTE: In production or Vercel deployment, this URL should be dynamic. 
-      // For now we keep it as localhost:8000 assuming backend is running locally.
-      // If deployed, replace with process.env.NEXT_PUBLIC_API_URL or similar.
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${apiUrl}/api/run-pipeline`, {
+      // Uses the Next.js proxy route (/api/run-pipeline) which forwards
+      // to the Railway backend server-side. Works on both local and Vercel.
+      const response = await fetch("/api/run-pipeline", {
         method: "POST",
         body: formData,
       });
@@ -190,7 +188,7 @@ export default function DashboardPage() {
           </div>
           
           <a   
-            href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/download/${result.run_id}`}
+            href={`/api/download/${result.run_id}`}
             download
             className="group px-8 py-4 rounded-full font-semibold text-white border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all duration-300 shadow-[0_0_20px_rgba(52,211,153,0.1)] hover:shadow-[0_0_30px_rgba(52,211,153,0.2)] flex items-center gap-3 backdrop-blur-md"
           >
