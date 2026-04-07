@@ -8,8 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { run_id: string } }
+  { params }: { params: Promise<{ run_id: string }> }
 ) {
+  const { run_id } = await params;
   const backendUrl = process.env.API_URL;
 
   if (!backendUrl) {
@@ -20,7 +21,7 @@ export async function GET(
   }
 
   try {
-    const backendRes = await fetch(`${backendUrl}/api/download/${params.run_id}`);
+    const backendRes = await fetch(`${backendUrl}/api/download/${run_id}`);
 
     if (!backendRes.ok) {
       return NextResponse.json(
